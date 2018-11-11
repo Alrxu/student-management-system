@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>欢迎登录</title>
+  <link rel="stylesheet" type="text/css" href="/lib/bootstrap/css/bootstrap.min.css">
+  <script type="text/javascript" src="/js/jquery.min.js"></script>
+  <script type="text/javascript" src="/js/md5.js"></script>
+</head>
+<body>
+      <div class="container" style="margin-top:180px; ">
+
+        <div class="col-md-6 col-md-offset-3">
+            <div class="panel panel-primary">
+                <div class="panel-heading">登录学生管理系统</div>
+                <div class="panel-body">
+                   <div class="form-horizontal">
+                        <div class="form-group">
+                            <label for="uname" class="col-sm-2 control-label">用户名</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" name="username" id="usernameId" placeholder="请输入用户名">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="pwd" class="col-sm-2 control-label">密码</label>
+                            <div class="col-sm-10">
+                                <input type="password" class="form-control" name="password" id="passwordId" placeholder="请输入密码">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="pwd" class="col-sm-2 control-label">验证码</label>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control" name="vcode" id="vcodeId" placeholder="请输入验证码">
+                            </div>
+                            <div class="col-sm-3">
+                                <img id="vcodeimg" src="/accout/vcode">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-offset-2 col-sm-10">
+                                <!-- submit有一个默认的提交行为，不要加上 -->
+                                <!-- <button type="submit" onclick="login()"  class="btn btn-default">登录</button> -->
+                                <button onclick="login()"  class="btn btn-default">登录</button>
+                                &nbsp;&nbsp;
+                                <input  onclick="register();" type="button"  value="注册" class="btn btn-danger">
+                            </div>
+                        </div>
+                   </div>
+                </div>
+            </div>
+            </div>
+    </div>
+</body>
+<script>
+// 点击验证码图片,重新发送请求,由于get请求有缓存,url且url是不变的,所以重新发送的请求在url后面添加随机参数
+// 这样就相当于每次点击验证码图片都发送一次请求
+$('#vcodeimg').on('click',function () {
+    $(this).attr('src','/accout/vcode?vodeid='+Math.random())
+})
+
+function login(){
+    const username = $('#usernameId').val()
+    const password = $.md5($('#passwordId').val()+"&$AXNwerr@muicjaos")
+    const vcode = $('#vcodeId').val()
+    
+    //点击登录发送post请求,接收到返回来的提示信息
+    $.post('/accout/login',{username,password,vcode},(data)=>{
+        // data提示信息  {status: 0,message:"登录成功"} status!=0 则用户名或密码错误
+        if(data.status!=0){
+            alert(data.message)
+            // 登录失败,都要更换验证码,重新发送获取验证码的请求
+            $('#vcodeimg').attr('src','/accout/vcode?vodeid='+Math.random())
+        }else{
+            location.href = '/studentmanage/list'
+        }
+    })
+}
+</script>
+</html>
